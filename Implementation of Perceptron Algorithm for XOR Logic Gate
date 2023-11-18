@@ -1,0 +1,83 @@
+
+
+
+import numpy as np 
+def sigmoid (x):
+    return 1/(1 + np.exp(-x))
+
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+#Input verileri
+x = np.array([[0,0],[0,1],[1,0],[1,1]])
+t = np.array([[0],[1],[1],[0]])
+x.shape,t.shape
+
+epochs = 100000
+
+#öğrenme parametresi
+lr = 0.01
+
+
+# Bu, 2 giriş düğümü, 2 boyutlu bir gizli katman ve 1 çıkış katmanı anlamına gelir.
+ILNeurons, HLNeurons, OLNeurons = 2,2,1
+
+#Random weights 
+#wh = np.random.uniform(size=(ILNeurons,HLNeurons))
+#print(wh)
+
+
+bh =np.random.uniform(size=(1,HLNeurons))
+wo = np.random.uniform(size=(HLNeurons,OLNeurons))
+#print(wo)
+bo = np.random.uniform(size=(1,OLNeurons))
+
+
+
+wh = []
+for i in range(ILNeurons):
+    row = []
+    for j in range(HLNeurons):
+        element = float(input(f"Ağırlık değerleri için Matrisin ({i+1},{j+1}) elemanını girin: "))
+        row.append(element)
+    wh.append(row)
+
+
+
+
+    #Algoritmayı eğitme
+for i in range(epochs):
+        
+    #İleriye yayılma algoritmasının uygulanması
+    vh= np.dot(x,wh)
+    vh = vh+bh
+    yh = sigmoid(vh)
+
+    vo = np.dot(yh,wo)
+    vo = vo+bo
+    yo = sigmoid(vo)
+
+    #Geriye yayılma algoritmasının uygulanması
+    error = t - yo
+    deltao = error * sigmoid_derivative(yo)
+    hidden_error = deltao.dot(wo.T)
+    deltah = hidden_error * sigmoid_derivative(yh)
+
+    # Ağırlıkları ve Bias'ları Güncelleme
+    wo += yh.T.dot(deltao) *lr
+    bo += np.sum(deltao,axis=0,keepdims=True) *lr
+    wh += x.T.dot(deltah)*lr
+    bh += np.sum(deltah,axis=0,keepdims=True) *lr
+
+print("Finaldeki gizli ağırlıklar: ",end='')
+print(*wh)
+print("Finaldeki gizli bias'ı': ",end='')
+print(*bh)
+print("Final çıkış ağırlıkları: ",end='')
+print(*wo)
+print("Final çıkış bias'ı': ",end='')
+print(*bo)
+
+print("\n10,000 epochs'tan sonra sinir ağından çıktı': ",end='')
+print(*yo)
+
